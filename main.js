@@ -59,7 +59,6 @@ document.getElementById('i2c-read').addEventListener('click', async () => {
 });
 
 document.getElementById('i2c-dump').addEventListener('click', async () => {
-    logMessage('MCP2221A - DUMP');
     const slaveAddress = parseInt(document.getElementById('i2c-slave-address').value, 16);
     const firstRegisterAddress = parseInt(document.getElementById('i2c-register-address-first').value, 16);
     const lastRegisterAddress = parseInt(document.getElementById('i2c-register-address-last').value, 16);
@@ -280,7 +279,7 @@ async function toggleGPIO(pin) {
 function logMessage(...messages) {
   const log = document.getElementById('log');
   const combinedMessage = messages.join(',')
-  const timestamp = new Date().toLocaleTimeString();
+  const timestamp = new Date().toLocaleTimeString('en-US');
   log.textContent += `[${timestamp}],${combinedMessage}\n`;
   log.scrollTop = log.scrollHeight; // Scroll to the bottom
 }

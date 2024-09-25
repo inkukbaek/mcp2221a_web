@@ -293,15 +293,16 @@ function clearlogMessage() {
 
 function extractlogMessage() {
     const log = document.getElementById('log');
+    const logText = log.textContent
     const timestamp = new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         hour12: false
     }).replace(/:/g, '');;
-    logText = log.textContent
+
     fileName = `log_dump_${timestamp}.csv`
-    let encodedUri = encodeURI(log);
+    let encodedUri = encodeURI(logText);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", fileName);

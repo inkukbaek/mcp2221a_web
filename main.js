@@ -279,29 +279,29 @@ async function toggleGPIO(pin) {
 
 function logMessage(...messages) {
   const log = document.getElementById('log');
-  const combinedMessage = messages.join(' ')
+  const combinedMessage = messages.join(',')
   const timestamp = new Date().toLocaleTimeString();
-  log.textContent += `[${timestamp}] ${combinedMessage}\n`;
+  log.textContent += `[${timestamp}],${combinedMessage}\n`;
   log.scrollTop = log.scrollHeight; // Scroll to the bottom
 }
 
 function clearlogMessage() {
     const log = document.getElementById('log');
-    log.textContent = ''
+    log.textContent = '';
     log.scrollTop = log.scrollHeight; // Scroll to the bottom
   }
 
 function extractlogMessage() {
     const log = document.getElementById('log');
-    const logText = log.textContent
+    const logText = "data:text/csv;charset=utf-8,"+log.textContent;
     const timestamp = new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         hour12: false
-    }).replace(/:/g, '');;
+    }).replace(/:/g, '');
 
-    const fileName = `log_dump_${timestamp}.csv`
+    const fileName = `log_dump_${timestamp}.csv`;
     let encodedUri = encodeURI(logText);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);

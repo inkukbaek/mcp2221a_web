@@ -47,7 +47,7 @@ document.getElementById('i2c-read').addEventListener('click', async () => {
     const registerAddress = parseInt(document.getElementById('i2c-register-address').value, 16);
     const length = parseInt(document.getElementById('i2c-length').value);
     // Implement I2C read using WebHID API
-    logMessage( 'i2c-read', hexString(slaveAddress), hexString(registerAddress), hexString(length) );
+    // logMessage( 'i2c-read', hexString(slaveAddress), hexString(registerAddress), hexString(length) );
     const i2cReadData = await mcp.i2cRead(slaveAddress, registerAddress, length);
     if (i2cReadData.success){
         console.log('i2cReadData', i2cReadData.data);
@@ -107,6 +107,14 @@ document.getElementById('i2c-find-addr').addEventListener('click', async () => {
     // logMessage(i2c_addr_found);
     document.getElementById('i2c-slave-address').value = hexString(i2c_addr_found[0])
 
+});
+
+document.getElementById('clear-log').addEventListener('click', async () => {
+    clearlogMessage()
+});
+
+document.getElementById('extract-log').addEventListener('click', async () => {
+    extractlogMessage()
 });
 
 const gpioLength = 4
@@ -276,6 +284,32 @@ function logMessage(...messages) {
   log.textContent += `[${timestamp}] ${combinedMessage}\n`;
   log.scrollTop = log.scrollHeight; // Scroll to the bottom
 }
+
+function clearlogMessage() {
+    const log = document.getElementById('log');
+    log.textContent = ''
+    log.scrollTop = log.scrollHeight; // Scroll to the bottom
+  }
+
+function extractlogMessage() {
+    const log = document.getElementById('log');
+    const timestamp = new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    }).replace(/:/g, '');;
+    logText = log.textContent
+    fileName = `log_dump_${timestamp}.csv`
+    let encodedUri = encodeURI(log);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", fileName);
+    // 다운로드 링크를 클릭해서 파일 다운로드를 트리거
+    document.body.appendChild(link); // 필요한 경우에만 추가
+    link.click();
+    document.body.removeChild(link); // 클릭 후 링크 제거
+  }
 
 function consoleMessage(...messages) {
     const console = document.getElementById('console');

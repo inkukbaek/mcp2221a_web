@@ -455,7 +455,7 @@ export class MCP2221 {
         const reportId = 0
         await this.device.sendReport(reportId, new Uint8Array(command))
         logMessage('MCP2221A is now reset')
-        await sleep(500)
+        await sleep(1)
     }
 
     async i2cWriteNoStop(address, length) {

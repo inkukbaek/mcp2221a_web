@@ -301,7 +301,7 @@ function extractlogMessage() {
         hour12: false
     }).replace(/:/g, '');;
 
-    fileName = `log_dump_${timestamp}.csv`
+    const fileName = `log_dump_${timestamp}.csv`
     let encodedUri = encodeURI(logText);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);

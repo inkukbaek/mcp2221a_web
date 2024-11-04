@@ -318,7 +318,9 @@ export class MCP2221 {
         try {
             const receivedData = await this.sendAndReceive(command_w);
             // console.log("Final received data:", receivedData);
-            const write_success = true;
+            let write_success
+            write_success = true;
+
             if (receivedData[1]==0x01) { // error check, error if data[1] is 0x41
                 write_success = false;
             };

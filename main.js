@@ -58,6 +58,63 @@ document.getElementById('i2c-read').addEventListener('click', async () => {
     }
 });
 
+let i2cScripts = [];
+
+document.getElementById('i2c-load-script').addEventListener('click', async () => {
+    document.getElementById("fileInput").click();
+    document.getElementById("fileInput").addEventListener("change", function(event) {
+        const selectedFile = event.target.files[0];
+            if (!selectedFile) return;
+            const reader = new FileReader();
+            // 파일 내용을 텍스트로 읽기
+            reader.readAsText(selectedFile);
+
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                // 각 줄이 (0x로 시작하는 hex, 0x로 시작하는 hex) 형식인지 확인
+                const isValid = lines.every(line => {
+                    line = line.trim();
+                    const regex = /^\(0x[0-9A-Fa-f]+,\s*0x[0-9A-Fa-f]+\)$/;
+                    return regex.test(line);
+                });
+
+                if (isValid) {
+                    logMessage(`File format is correct. Script: ${'\n'}${content}`);
+                    lines.forEach(line => {
+                        line = line.trim();
+                        const regex = /^\(0x[0-9A-Fa-f]+,\s*0x[0-9A-Fa-f]+\)$/;
+                        // 괄호와 공백을 제거하고, 쉼표로 나누기
+                        const [hex1, hex2] = line.replace(/[()]/g, '').split(',').map(s => s.trim());
+                        // 객체 형태로 저장
+                        i2cScripts.push({ hex1, hex2 });
+                    })
+
+                } else {
+                    logMessage("File format is incorrect. Please upload a valid file.");
+                    logMessage("Example File Format: (0x01, 0xab)");
+                }
+            };
+
+        });
+});
+
+// document.getElementById("i2c-run-script").addEventListener("click", function() {
+document.getElementById('i2c-run-script').addEventListener('click', async () => {
+
+    const slaveAddress = parseInt(document.getElementById('i2c-slave-address-script').value, 16);
+
+    for (const pair of i2cScripts) {
+        const registerAddress = parseInt(pair.hex1, 16);
+        // const data = parseInt(pair.hex2);
+        const data = pair.hex2.split(',').map(value => parseInt(value, 16));
+        const i2cWriteData = await mcp.i2cWrite(slaveAddress, registerAddress, data);
+        const writeLog = Array.from(i2cWriteData.data).map(x => hexString(x)).join(', ');
+        logMessage( 'MCP2221A - WRITE:', hexString(slaveAddress), hexString(registerAddress), `[${writeLog}]`);
+    }
+});
+
+
 document.getElementById('i2c-dump').addEventListener('click', async () => {
     const slaveAddress = parseInt(document.getElementById('i2c-slave-address').value, 16);
     const firstRegisterAddress = parseInt(document.getElementById('i2c-register-address-first').value, 16);
@@ -280,7 +337,7 @@ function logMessage(...messages) {
   const log = document.getElementById('log');
   const combinedMessage = messages.join(',')
   const timestamp = new Date().toLocaleTimeString('en-US');
-  log.textContent += `[${timestamp}],${combinedMessage}\n`;
+  log.textContent += `[${timestamp}] ${combinedMessage}\n`;
   log.scrollTop = log.scrollHeight; // Scroll to the bottom
 }
 

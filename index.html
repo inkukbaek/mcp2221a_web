@@ -89,6 +89,24 @@
                 </div>
                 <div class="i2c-container">
                     <div class="i2c-controls">
+                        <input type="file" id="fileInput" accept=".txt" style="display: none;">
+                        <div class="input-group">
+                            <label for="i2c-slave-address-script">I2C Slave Address for Script</label>
+                            <input type="text" id="i2c-slave-address-script" placeholder="Slave Address (hex)" value="0xf0">
+                        </div>
+                        <div class="button-group">
+                            <button id="i2c-load-script">Load Script</button>
+                        </div>
+                        <div class="button-group">
+                            <button id="i2c-run-script">Run Script</button>
+                        </div>
+                        <div class="input-group">
+                            <label for="i2c-script-format"> Script Format = '(Reg Addr(Hex), Data(Hex))'</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="i2c-container">
+                    <div class="i2c-controls">
                         <div class="input-group">
                             <label for="i2c-register-address-first">Dump Reg Address First</label>
                             <input type="text" id="i2c-register-address-first" placeholder="First Register Address (hex)" value="0x00">

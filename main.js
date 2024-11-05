@@ -59,44 +59,54 @@ document.getElementById('i2c-read').addEventListener('click', async () => {
 });
 
 let i2cScripts = [];
-
-document.getElementById('i2c-load-script').addEventListener('click', async () => {
-    document.getElementById("fileInput").click();
-    document.getElementById("fileInput").addEventListener("change", function(event) {
-        const selectedFile = event.target.files[0];
-            if (!selectedFile) return;
-            const reader = new FileReader();
-            // 파일 내용을 텍스트로 읽기
-            reader.readAsText(selectedFile);
-
-            reader.onload = function(e) {
-                const content = e.target.result;
-                const lines = content.split('\n');
-                // 각 줄이 (0x로 시작하는 hex, 0x로 시작하는 hex) 형식인지 확인
-                const isValid = lines.every(line => {
-                    line = line.trim();
-                    const regex = /^\(0x[0-9A-Fa-f]+,\s*0x[0-9A-Fa-f]+\)$/;
-                    return regex.test(line);
-                });
-
-                if (isValid) {
-                    logMessage(`File format is correct. Script: ${'\n'}${content}`);
-                    lines.forEach(line => {
-                        line = line.trim();
-                        const regex = /^\(0x[0-9A-Fa-f]+,\s*0x[0-9A-Fa-f]+\)$/;
-                        // 괄호와 공백을 제거하고, 쉼표로 나누기
-                        const [hex1, hex2] = line.replace(/[()]/g, '').split(',').map(s => s.trim());
-                        // 객체 형태로 저장
-                        i2cScripts.push({ hex1, hex2 });
-                    })
-
-                } else {
-                    logMessage("File format is incorrect. Please upload a valid file.");
-                    logMessage("Example File Format: (0x01, 0xab)");
-                }
-            };
-
+document.getElementById("fileInput").addEventListener("change", function (event) {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+    logMessage(`File Name: ${selectedFile.name}`);
+    const reader = new FileReader();
+    // 파일 내용을 텍스트로 읽기
+    reader.readAsText(selectedFile);
+    reader.onload = function (e) {
+        const content = e.target.result;
+        const lines = content.split('\n');
+        // 각 줄이 (0x로 시작하는 hex, 0x로 시작하는 hex) 형식인지 확인
+        const isValid = lines.every(line => {
+            line = line.trim();
+            const regex = /^\(0x[0-9A-Fa-f]+,\s*0x[0-9A-Fa-f]+\)$/;
+            return line === '' || regex.test(line);
         });
+
+        if (isValid) {
+            logMessage(`File format is correct. Script Echo`);
+            lines.forEach(line => {
+                line = line.trim();
+                if (line === '') return;
+                logMessage(`${line}`);
+            });
+            // 기존 스크립트 초기화 후 새 스크립트 추가
+            i2cScripts = [];
+            lines.forEach(line => {
+                line = line.trim();
+                // 빈 줄이면 다음 줄로 넘어가기
+                if (line === '') return;
+                // 괄호와 공백을 제거하고, 쉼표로 나누기
+                const [hex1, hex2] = line.replace(/[()]/g, '').split(',').map(s => s.trim());
+                // 객체 형태로 저장
+                i2cScripts.push({ hex1, hex2 });
+            });
+
+        } else {
+            logMessage("File format is incorrect. Please upload a valid file.");
+            logMessage("Example File Format: (0x01, 0xab)");
+        }
+    };
+    // 같은 파일을 다시 로드할 수 있도록 input 값 초기화
+    event.target.value = '';
+});
+
+// 버튼 클릭 시 파일 선택 대화 상자를 열기
+document.getElementById('i2c-load-script').addEventListener('click', () => {
+    document.getElementById("fileInput").click();
 });
 
 // document.getElementById("i2c-run-script").addEventListener("click", function() {
